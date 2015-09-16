@@ -48,7 +48,7 @@ public class Bootstrap {
             throw new Exception("Number of configurations on the command line doesn't match with the number"
                     + "of configurations in the config file");
         }
-
+        System.out.println("\n\n-----------------------------------------------------------------------------\n");
         for(int x=1;x<arguements.length;x++){
             String tempCommand = command;
 
@@ -60,10 +60,12 @@ public class Bootstrap {
             HashMap<String,String> currentConfigs = configs.get(x-1);
             runRemoteCommands(currentConfigs,envs);
             LoadTest loadTest = new BashTest();
-            System.out.println("Running Command - "+tempCommand);
+            System.out.println("Running Command - "+tempCommand+"\n");
             loadTest.runTest(tempCommand);
         }
         System.out.println("All Tests Completed");
+        System.out.println("\n-----------------------------------------------------------------------------\n\n");
+
     }
 
     private static void makeConfigMap(ArrayList<HashMap<String,String>> configs,File configFile) throws IOException {
@@ -173,7 +175,7 @@ public class Bootstrap {
             }
             if(sshCommandSplit[0].equals("RUN")){
                 String tempCommand = premadeEnv+sshCommandSplit[1];
-                System.out.println("Running Remote Command - "+tempCommand);
+                System.out.println("Running Remote Command - "+tempCommand+"\n");
                 conn.execCommand(tempCommand);
             }else if(sshCommandSplit[0].equals("UPLOAD")){
                 String [] fileUpload = sshCommandSplit[1].split("-->>");
@@ -185,7 +187,7 @@ public class Bootstrap {
                 if(!f.exists()){
                     continue;
                 }
-                System.out.println("Uploading file - " + f.getName());
+                System.out.println("Uploading file - " + f.getName()+"\n");
                 conn.putFile(f,fileUpload[1].trim());
             }
         }
