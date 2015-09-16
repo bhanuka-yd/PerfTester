@@ -37,7 +37,7 @@ public class Bootstrap {
         }
 
 
-        ArrayList<HashMap<String,String>> configs = new ArrayList<HashMap<String,String>>();
+        ArrayList<ArrayList<HashMap<String,String>>> configs = new ArrayList<ArrayList<HashMap<String,String>>>();
         makeConfigMap(configs,configFile);
 
         String [] arguements = args[0].split("%");
@@ -57,10 +57,12 @@ public class Bootstrap {
                 tempCommand = tempCommand.replaceFirst("@@",y);
             }
 
-            HashMap<String,String> currentConfigs = configs.get(x-1);
-            runRemoteCommands(currentConfigs,envs);
+            for(HashMap<String,String> currentConfigs : configs.get(x-1)){
+                runRemoteCommands(currentConfigs,envs);
+            }
+
             LoadTest loadTest = new BashTest();
-            System.out.println("Running Command - "+tempCommand+"\n");
+            System.out.println("Running Command - "+tempCommand + "\n");
             loadTest.runTest(tempCommand);
         }
         System.out.println("All Tests Completed");
@@ -68,21 +70,36 @@ public class Bootstrap {
 
     }
 
-    private static void makeConfigMap(ArrayList<HashMap<String,String>> configs,File configFile) throws IOException {
+    private static void makeConfigMap(ArrayList<ArrayList<HashMap<String,String>>> configs,File configFile) throws IOException {
         BufferedReader fileReader = new BufferedReader(new FileReader(configFile));
         String line = null;
+        ArrayList<HashMap<String,String>> currentList = new ArrayList<HashMap<String,String>>();
         HashMap<String,String> currentMap=new HashMap<String,String>();
+
         while((line=fileReader.readLine())!=null){
             String [] keyVal= line.split(":-");
 
             switch (keyVal[0]){
+            case "----":{
+                if(currentList.size()==0){
+                    currentList.add(currentMap);
+                }
+                currentMap = new HashMap<String,String>();
+                currentList.add(currentMap);
+                break;
+            }
             case "##$$##":{
 
                 if(configs.size()==0){
-                    configs.add(currentMap);
+                    if(currentList.size()==0){
+                        currentList.add(currentMap);
+                    }
+                    configs.add(currentList);
                 }
+                currentList = new ArrayList<HashMap<String,String>>();
                 currentMap = new HashMap<String,String>();
-                configs.add(currentMap);
+                currentList.add(currentMap);
+                configs.add(currentList);
                 break;
             }
             case "host":{
@@ -139,6 +156,7 @@ public class Bootstrap {
             }
             }
         }
+        System.out.println("--------- "+configs.get(0).size());
     }
 
     private static void runRemoteCommands(HashMap<String,String> currentConfigs,File envs) throws IOException {
