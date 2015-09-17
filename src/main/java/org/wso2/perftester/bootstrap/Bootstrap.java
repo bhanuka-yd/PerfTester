@@ -17,6 +17,10 @@ import java.util.HashMap;
 public class Bootstrap {
     public static void main(String[] args) throws Exception {
 
+        if(args.length==0){
+            throw new IllegalArgumentException("No Commandline arguements found");
+        }
+
         File configFile;
         if(args[1]!=null){
             configFile = new File(args[1]);
@@ -154,6 +158,24 @@ public class Bootstrap {
                 currentMap.put("COMMAND",arr.toString());
                 break;
             }
+            case "WAIT":{
+                if(keyVal.length<2){
+                    throw new IllegalArgumentException("WAIT value cannot be found");
+                }
+                if(!isNumeric(keyVal[1].trim())){
+                    throw new IllegalArgumentException("Invalid WAIT value");
+                }
+                JSONArray arr =null;
+                if(currentMap.get("COMMAND")==null){
+                    arr = new JSONArray();
+                }else{
+                    arr = new JSONArray(currentMap.get("COMMAND"));
+                }
+
+                arr.put(line);
+                currentMap.put("COMMAND",arr.toString());
+                break;
+            }
             case "env":{
                 if(keyVal.length<2){
                     throw new IllegalArgumentException("env Filepath not found");
@@ -203,11 +225,11 @@ public class Bootstrap {
             if(sshCommandSplit.length<2){
                 continue;
             }
-            if(sshCommandSplit[0].equals("RUN")){
+            if(sshCommandSplit[0].trim().equals("RUN")){
                 String tempCommand = premadeEnv+sshCommandSplit[1];
                 System.out.println("Running Remote Command - "+tempCommand+"\n");
                 conn.execCommand(tempCommand);
-            }else if(sshCommandSplit[0].equals("UPLOAD")){
+            }else if(sshCommandSplit[0].trim().equals("UPLOAD")){
                 String [] fileUpload = sshCommandSplit[1].split("-->>");
                 if(fileUpload.length<2){
                     continue;
@@ -219,7 +241,24 @@ public class Bootstrap {
                 }
                 System.out.println("Uploading file - " + f.getName()+"\n");
                 conn.putFile(f,fileUpload[1].trim());
+            }else if(sshCommandSplit[0].trim().equals("WAIT")){
+                Long waitTime = Long.parseLong(sshCommandSplit[1].trim());
+                System.out.println("Waiting the Thread for "+waitTime+" millisecond(s)\n");
+                try {
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
+    }
+    private static boolean isNumeric(String value){
+        try{
+         long val = Long.parseLong(value);
+        }
+        catch (Exception e){
+            return false;
+        }
+        return true;
     }
 }

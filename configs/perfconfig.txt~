@@ -9,6 +9,7 @@ host:-204.13.85.5
 username:-boauser
 password:-boa@123
 env:-/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/envs.txt
+WAIT:-5000
 RUN:-echo $JAVA_HOME >/home/boauser/helloMister.txt
 ##$$##
 host:-204.13.85.5
