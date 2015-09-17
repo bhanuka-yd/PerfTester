@@ -1,22 +1,26 @@
 host:-204.13.85.5
 username:-boauser
 password:-boa@123
+env:-/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/envs.txt
 RUN:-echo $JAVA_HOME >/home/boauser/hello1.txt
 UPLOAD:-/home/bhanuka/MSS/configs/helloDoc1-->>/home/boauser
 ----
 host:-204.13.85.5
 username:-boauser
 password:-boa@123
+env:-/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/envs.txt
 RUN:-echo $JAVA_HOME >/home/boauser/helloMister.txt
 ##$$##
 host:-204.13.85.5
 username:-boauser
 password:-boa@123
+env:-/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/envs.txt
 RUN:-echo $JAVA_HOME >/home/boauser/hello2.txt
 UPLOAD:-/home/bhanuka/MSS/configs/helloDoc2-->>/home/boauser
 ##$$##
 host:-204.13.85.5
 username:-boauser
 password:-boa@123
+env:-/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/envs.txt
 RUN:-echo $JAVA_HOME >/home/boauser/hello3.txt
 UPLOAD:-/home/bhanuka/MSS/configs/helloDoc3-->>/home/boauser

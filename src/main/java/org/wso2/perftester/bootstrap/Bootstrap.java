@@ -58,7 +58,7 @@ public class Bootstrap {
             }
 
             for(HashMap<String,String> currentConfigs : configs.get(x-1)){
-                runRemoteCommands(currentConfigs,envs);
+                runRemoteCommands(currentConfigs);
             }
 
             LoadTest loadTest = new BashTest();
@@ -154,19 +154,31 @@ public class Bootstrap {
                 currentMap.put("COMMAND",arr.toString());
                 break;
             }
+            case "env":{
+                if(keyVal.length<2){
+                    throw new IllegalArgumentException("env Filepath not found");
+                }
+                File f = new File(keyVal[1].trim());
+                if(!f.exists()){
+                    throw new FileNotFoundException("env file not found");
+                }
+                currentMap.put("env",keyVal[1].trim());
+                break;
+            }
             }
         }
         System.out.println("--------- "+configs.get(0).size());
     }
 
-    private static void runRemoteCommands(HashMap<String,String> currentConfigs,File envs) throws IOException {
+    private static void runRemoteCommands(HashMap<String,String> currentConfigs) throws IOException {
+
         SSHConnection conn = new SSHConnection(currentConfigs.get("host"),
                 currentConfigs.get("username"),
                 currentConfigs.get("password"));
 
         conn.connect();
 
-        BufferedReader envReader = new BufferedReader(new FileReader(envs));
+        BufferedReader envReader = new BufferedReader(new FileReader(new File(currentConfigs.get("env"))));
         String premadeEnv="";
         String enVariable=null;
         while((enVariable=envReader.readLine())!=null){
