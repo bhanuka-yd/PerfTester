@@ -3,10 +3,7 @@ package org.wso2.perftester.ssh;
 import ch.ethz.ssh2.*;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * Created by root on 9/15/15.
@@ -34,12 +31,26 @@ public class SSHConnection {
     public void execCommand(String command) throws IOException {
         Session session = conn.openSession();
         session.execCommand(command);
+        session.waitForCondition(ChannelCondition.EXIT_SIGNAL | ChannelCondition.EXIT_STATUS,0);
+        session.close();
+    }
 
-        int b = 1;
-        InputStream is = new StreamGobbler(session.getStdout());
-        while ((b = is.read()) != -1) {
-            System.out.print((char)b);
+    public void execCommandWithPrompt(String command,String input,long waitTime,long timeOut) throws IOException {
+        Session session = conn.openSession();
+        session.execCommand(command);
+
+        try {
+            Thread.sleep(waitTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+
+        PrintWriter writer = new PrintWriter(session.getStdin());
+        writer.println(input+"\n");
+        writer.flush();
+
+        session.waitForCondition(ChannelCondition.EXIT_SIGNAL | ChannelCondition.EXIT_STATUS, timeOut);
         session.close();
     }
 

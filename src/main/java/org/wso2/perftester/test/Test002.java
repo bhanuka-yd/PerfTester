@@ -7,8 +7,7 @@ import org.wso2.perftester.bootstrap.Bootstrap;
  */
 public class Test002 {
     public static void main(String[] args) throws Exception {
-        Bootstrap.main(new String[]{"touch @@.txt %hello1%hello2%hello3",
-                "/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/perfconfig.txt",
-        "/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/envs.txt"});
+        Bootstrap.main(new String[]{"touch @@.txt %hello1%hello2",
+                "/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/perfconfig.txt", });
     }
 }

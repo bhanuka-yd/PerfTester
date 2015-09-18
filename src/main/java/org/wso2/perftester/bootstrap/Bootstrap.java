@@ -10,6 +10,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by root on 9/11/15.
@@ -30,16 +32,6 @@ public class Bootstrap {
         }else{
             throw new IllegalArgumentException("Please specify a config file");
         }
-        File envs;
-        if(args[2]!=null){
-            envs = new File(args[2]);
-            if(!configFile.exists()){
-                throw new IllegalArgumentException("Environment variables File does not exist");
-            }
-        }else{
-            throw new IllegalArgumentException("Please specify a Environment variables file");
-        }
-
 
         ArrayList<ArrayList<HashMap<String,String>>> configs = new ArrayList<ArrayList<HashMap<String,String>>>();
         makeConfigMap(configs,configFile);
@@ -79,7 +71,8 @@ public class Bootstrap {
         String line = null;
         ArrayList<HashMap<String,String>> currentList = new ArrayList<HashMap<String,String>>();
         HashMap<String,String> currentMap=new HashMap<String,String>();
-
+        currentList.add(currentMap);
+        configs.add(currentList);
         while((line=fileReader.readLine())!=null){
             String [] keyVal= line.split(":-");
 
@@ -189,7 +182,6 @@ public class Bootstrap {
             }
             }
         }
-        System.out.println("--------- "+configs.get(0).size());
     }
 
     private static void runRemoteCommands(HashMap<String,String> currentConfigs) throws IOException {
@@ -226,11 +218,28 @@ public class Bootstrap {
                 continue;
             }
             if(sshCommandSplit[0].trim().equals("RUN")){
-                String tempCommand = premadeEnv+sshCommandSplit[1];
-                System.out.println("Running Remote Command - "+tempCommand+"\n");
-                conn.execCommand(tempCommand);
+                String tempCommand = premadeEnv+sshCommandSplit[1].trim();
+
+
+                if(sshCommandSplit[1].trim().split("<PROMPT>").length>1){
+
+                    String promptString = sshCommandSplit[1].trim().split("<PROMPT>")[1].trim();
+                    ArrayList<String> vals = getValuesWithinCurlyBrackets(promptString);
+                    if((vals.size()>2)&&isNumeric(vals.get(1))&&isNumeric(vals.get(2))){
+
+                        System.out.println("Running Remote Command - " + sshCommandSplit[1].trim().split("<PROMPT>")[0].trim() + " With Prompt "+vals.get(0).trim());
+                        conn.execCommandWithPrompt(premadeEnv+sshCommandSplit[1].trim().split("<PROMPT>")[0].trim(),
+                                vals.get(0).trim(),Long.parseLong(vals.get(1)),Long.parseLong(vals.get(2)));
+
+                    }else{
+                        System.err.println("Ignoring Command Invalid Variables\n");
+                    }
+                }else{
+                    System.out.println("Running Remote Command - " + tempCommand + "\n");
+                    conn.execCommand(tempCommand);
+                }
             }else if(sshCommandSplit[0].trim().equals("UPLOAD")){
-                String [] fileUpload = sshCommandSplit[1].split("-->>");
+                String [] fileUpload = sshCommandSplit[1].trim().split("-->>");
                 if(fileUpload.length<2){
                     continue;
                 }
@@ -260,5 +269,16 @@ public class Bootstrap {
             return false;
         }
         return true;
+    }
+    private static ArrayList<String>getValuesWithinCurlyBrackets(String line){
+        Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+        Matcher matcher = pattern.matcher(line);
+        ArrayList<String> matches = new ArrayList<String>();
+        while(matcher.find()){
+            String match = matcher.group();
+            match=match.substring(1,match.length()-1);
+            matches.add(match.trim());
+        }
+        return matches;
     }
 }
