@@ -115,11 +115,13 @@ public class Bootstrap {
                 break;
             }
             case "password":{
-                if(keyVal.length<2){
-                    throw new IllegalArgumentException("Password value cannot be found");
-                }
-                currentMap.put("password",keyVal[1]);
+                currentMap.put("password",(keyVal.length>1)?keyVal[1]:"");
                 break;
+            }case "keyfile": {
+                if(keyVal.length>2){
+                    throw new IllegalArgumentException("Key File value cannot be found");
+                }
+                currentMap.put("keyfile",keyVal[1]);
             }
             case "RUN":{
                 if(keyVal.length<2){
@@ -190,20 +192,33 @@ public class Bootstrap {
                 currentConfigs.get("username"),
                 currentConfigs.get("password"));
 
-        conn.connect();
 
-        BufferedReader envReader = new BufferedReader(new FileReader(new File(currentConfigs.get("env"))));
-        String premadeEnv="";
-        String enVariable=null;
-        while((enVariable=envReader.readLine())!=null){
-            String [] trimmer = enVariable.split("=");
-            if(trimmer.length<2){
-                continue;
+        if(currentConfigs.containsKey("keyfile")){
+            File privateKey= new File(currentConfigs.get("keyfile"));
+            if(!privateKey.exists()){
+                throw new FileNotFoundException("Private Key cannot be found");
             }
-            enVariable = trimmer[0].trim()+"="+trimmer[1].trim();
-            premadeEnv=enVariable+" && ";
+            conn.connectWithKeyFile(privateKey);
+
+        }else {
+            conn.connect();
         }
 
+        String premadeEnv="";
+
+        if(currentConfigs.get("env")!=null) {
+            File envFile = new File(currentConfigs.get("env"));
+            BufferedReader envReader = new BufferedReader(new FileReader(envFile));
+            String enVariable = null;
+            while ((enVariable = envReader.readLine()) != null) {
+                String[] trimmer = enVariable.split("=");
+                if (trimmer.length < 2) {
+                    continue;
+                }
+                enVariable = trimmer[0].trim() + "=" + trimmer[1].trim();
+                premadeEnv = enVariable + " && ";
+            }
+        }
         JSONArray commandArray;
         if(currentConfigs.get("COMMAND")!=null){
             commandArray=new JSONArray(currentConfigs.get("COMMAND"));

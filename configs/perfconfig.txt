@@ -1,13 +1,5 @@
-host:-204.13.85.2
-username:-boauser
-password:-boa@123
-env:-/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/envs.txt
-RUN:-sh /home/boauser/wso2gw/perf/wso2carbon-kernel-5.0.0-SNAPSHOT/bin/wso2server.sh <PROMPT> {startTransport netty-gw}{5000}{10000}
-UPLOAD:-/home/bhanuka/MSS/configs/helloDoc1-->>/home/boauser
-##$$##
-host:-204.13.85.2
-username:-boauser
-password:-boa@123
-env:-/home/bhanuka/MSS/PerfTesterJava/PerfTester/configs/envs.txt
-RUN:-sh /home/boauser/wso2gw/perf/wso2carbon-kernel-5.0.0-SNAPSHOT/bin/wso2server.sh <PROMPT> {startTransport netty-gw}{5000}{10000}
-UPLOAD:-/home/bhanuka/MSS/configs/helloDoc1-->>/home/boauser
+host:-54.172.250.119
+username:-ubuntu
+password:-
+keyfile:-/home/bhanuka/.ssh/ebaytest.pem
+RUN:-sudo touch helloWorld.txt

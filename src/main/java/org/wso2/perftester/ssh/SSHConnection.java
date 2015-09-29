@@ -21,7 +21,16 @@ public class SSHConnection {
 
     public ConnectionInfo connect() throws IOException {
         ConnectionInfo info = conn.connect();
-        boolean isAuthenticated = conn.authenticateWithPassword(username,password);
+        boolean isAuthenticated = conn.authenticateWithPassword(username, password);
+        if(!isAuthenticated){
+            throw new IOException("Authentication Failed");
+        }
+        return info;
+    }
+
+    public ConnectionInfo connectWithKeyFile(File privateKey) throws IOException {
+        ConnectionInfo info = conn.connect();
+        boolean isAuthenticated = conn.authenticateWithPublicKey(username,privateKey,password);
         if(!isAuthenticated){
             throw new IOException("Authentication Failed");
         }

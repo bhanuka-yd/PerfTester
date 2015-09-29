@@ -2,6 +2,7 @@ package org.wso2.perftester.test;
 
 import org.wso2.perftester.ssh.SSHConnection;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -9,12 +10,14 @@ import java.io.IOException;
  */
 public class Test004 {
     public static void main(String[] args) throws IOException {
-        SSHConnection sshConnection = new SSHConnection("127.0.0.1","bhanuka","hello123");
-        sshConnection.connect();
-        System.out.println("Running");
-        long timestart = System.currentTimeMillis();
-        sshConnection.execCommand("sh waiter.sh");
-        long timeend = System.currentTimeMillis();
-        System.out.println("Running time = "+(timeend-timestart)/1000+"s");
+        File privateKey = new File("/home/bhanuka/.ssh/ebaytest.pem");
+        SSHConnection sshConnection = new SSHConnection("54.172.250.119","ubuntu","");
+        sshConnection.connectWithKeyFile(privateKey);
+//        System.out.println("Running");
+//        long timestart = System.currentTimeMillis();
+//        sshConnection.execCommand("sh waiter.sh");
+//        long timeend = System.currentTimeMillis();
+//        System.out.println("Running time = "+(timeend-timestart)/1000+"s");
+        sshConnection.execCommand("sudo touch helloWorld.txt");
     }
 }
